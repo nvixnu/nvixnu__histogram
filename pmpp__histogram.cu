@@ -1,7 +1,7 @@
-#include "nvixnu__histogram.h"
+#include "pmpp__histogram.h"
 
 __global__
-void nvixnu__histogram_aggregated_kernel(char* input, const int input_length, int* output, const int output_length) {
+void pmpp__histogram_aggregated_kernel(char* input, const int input_length, int* output, const int output_length) {
 	extern __shared__ unsigned int agg_histo_s[];
 	unsigned int tid = blockIdx.x*blockDim.x + threadIdx.x;
 
@@ -34,7 +34,7 @@ void nvixnu__histogram_aggregated_kernel(char* input, const int input_length, in
 }
 
 __global__
-void nvixnu__histogram_privatized_kernel(char* input, const int input_length, int* output, const int output_length) {
+void pmpp__histogram_privatized_kernel(char* input, const int input_length, int* output, const int output_length) {
 	extern __shared__ unsigned int priv_histo_s[];
 
 	unsigned int tid = blockIdx.x*blockDim.x + threadIdx.x;
@@ -58,7 +58,7 @@ void nvixnu__histogram_privatized_kernel(char* input, const int input_length, in
 }
 
 __global__
-void nvixnu__histogram_with_interleaved_partitioning_kernel(char *input, const int length, int *output){
+void pmpp__histogram_with_interleaved_partitioning_kernel(char *input, const int length, int *output){
 	unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
 	for (unsigned int i = tid; i < length; i += blockDim.x*gridDim.x ) {
 		int alphabet_position = input[i] - 'a';
@@ -69,7 +69,7 @@ void nvixnu__histogram_with_interleaved_partitioning_kernel(char *input, const i
 }
 
 __global__
-void nvixnu__histogram_with_block_partitioning_kernel(char *input, const int length, int *output){
+void pmpp__histogram_with_block_partitioning_kernel(char *input, const int length, int *output){
 	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	int section_size = ceil(length/(double)(blockDim.x * gridDim.x));
 	int start = i*section_size;
@@ -84,7 +84,7 @@ void nvixnu__histogram_with_block_partitioning_kernel(char *input, const int len
 	}
 }
 
-void nvixnu__histogram_host(char *input, const int length, int *output){
+void pmpp__histogram_host(char *input, const int length, int *output){
 	for (int i = 0; i < length; i++) {
 		int alphabet_position = input[i] - 'a';
 		if (alphabet_position >= 0 && alphabet_position < 26) {
